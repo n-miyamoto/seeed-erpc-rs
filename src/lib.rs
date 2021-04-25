@@ -49,12 +49,14 @@ pub trait RPC {
 mod system_rpcs;
 mod tcpip_rpcs;
 mod wifi_rpcs;
+mod lwip_rpcs;
 
 /// The RPCs which can be called to control the wifi.
 pub mod rpcs {
     pub use crate::system_rpcs::*;
     pub use crate::tcpip_rpcs::*;
     pub use crate::wifi_rpcs::*;
+    pub use crate::lwip_rpcs::*;
 }
 
 /// Specifies a layer 3 interface to be affected by the command.

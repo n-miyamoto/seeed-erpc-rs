@@ -32,6 +32,7 @@ pub enum Service {
     BLECallback = 13,
     Wifi = 14,
     TCPIP = 15,
+    LWIP = 16,
     WifiCallback = 18,
     Unknown = 255,
 }
@@ -46,6 +47,7 @@ impl From<u8> for Service {
             13 => Service::BLECallback,
             14 => Service::Wifi,
             15 => Service::TCPIP,
+            16 => Service::LWIP,
             18 => Service::WifiCallback,
             _ => Service::Unknown,
         }
@@ -116,6 +118,27 @@ pub enum TCPIPRequest {
 
 impl From<TCPIPRequest> for u8 {
     fn from(r: TCPIPRequest) -> u8 {
+        r as u8
+    }
+}
+
+/// Wio Terminal request IDs for the lwip service
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[allow(unused)]
+pub enum LWIPRequest {
+    Getsockopt = 6,
+    Setsockopt = 7,
+    Close = 8,
+    Connect = 9, 
+    Recv = 12, 
+    Send = 17,
+    Socket = 18,
+    Select = 21,
+    Fcntl = 23,
+}
+
+impl From<LWIPRequest> for u8 {
+    fn from(r: LWIPRequest) -> u8 {
         r as u8
     }
 }
