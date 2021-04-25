@@ -1,8 +1,5 @@
 use super::{codec, ids, Err};
-use nom::{
-    bytes::streaming::take, lib::std::ops::RangeFrom, lib::std::ops::RangeTo, number::streaming,
-    InputIter, InputLength, Slice,
-};
+use nom::number::streaming;
 
 /// lwip socket function 
 pub struct Socket {
@@ -92,6 +89,94 @@ impl super::RPC for Getsockopt {
         if hdr.msg_type != ids::MsgType::Reply
             || hdr.service != ids::Service::LWIP
             || hdr.request != ids::LWIPRequest::Getsockopt.into()
+        {
+            return Err(Err::NotOurs);
+        }
+
+        let (_, num) = streaming::le_i32(data)?;
+        Ok(num)
+    }
+}
+
+/// lwip fcntl function 
+pub struct Fcntl{
+    pub s: i32,
+    pub cmd: i32,
+    pub val: i32,
+}
+
+impl super::RPC for Fcntl{
+    type ReturnValue = i32;
+    type Error = ();
+
+    fn args(&self, buff: &mut heapless::Vec<u8, heapless::consts::U64>) {
+        let s= self.s as i32;
+        let cmd= self.cmd as i32;
+        let val = self.val as i32;
+
+        buff.extend_from_slice(&s.to_le_bytes()).ok();
+        buff.extend_from_slice(&cmd.to_le_bytes()).ok();
+        buff.extend_from_slice(&val.to_le_bytes()).ok();
+    }
+
+    fn header(&self, seq: u32) -> codec::Header {
+        codec::Header {
+            sequence: seq,
+            msg_type: ids::MsgType::Invocation,
+            service: ids::Service::LWIP,
+            request: ids::LWIPRequest::Fcntl.into(),
+        }
+    }
+
+    fn parse(&mut self, data: &[u8]) -> Result<Self::ReturnValue, Err<Self::Error>> {
+        let (data, hdr) = codec::Header::parse(data)?;
+        if hdr.msg_type != ids::MsgType::Reply
+            || hdr.service != ids::Service::LWIP
+            || hdr.request != ids::LWIPRequest::Fcntl.into()
+        {
+            return Err(Err::NotOurs);
+        }
+
+        let (_, num) = streaming::le_i32(data)?;
+        Ok(num)
+    }
+}
+
+/// lwip Connect function 
+pub struct Connect{
+    pub s: i32,
+    pub name: u32,
+    pub namelen: u32,
+}
+
+impl super::RPC for Connect{
+    type ReturnValue = i32;
+    type Error = ();
+
+    fn args(&self, buff: &mut heapless::Vec<u8, heapless::consts::U64>) {
+        let s= self.s as i32;
+        let name= self.name as i32;
+        let namelen = self.namelen as u32;
+
+        buff.extend_from_slice(&s.to_le_bytes()).ok();
+        buff.extend_from_slice(&name.to_le_bytes()).ok();
+        buff.extend_from_slice(&namelen.to_le_bytes()).ok();
+    }
+
+    fn header(&self, seq: u32) -> codec::Header {
+        codec::Header {
+            sequence: seq,
+            msg_type: ids::MsgType::Invocation,
+            service: ids::Service::LWIP,
+            request: ids::LWIPRequest::Connect.into(),
+        }
+    }
+
+    fn parse(&mut self, data: &[u8]) -> Result<Self::ReturnValue, Err<Self::Error>> {
+        let (data, hdr) = codec::Header::parse(data)?;
+        if hdr.msg_type != ids::MsgType::Reply
+            || hdr.service != ids::Service::LWIP
+            || hdr.request != ids::LWIPRequest::Connect.into()
         {
             return Err(Err::NotOurs);
         }
