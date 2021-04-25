@@ -145,7 +145,7 @@ impl super::RPC for Fcntl{
 /// lwip Connect function 
 pub struct Connect{
     pub s: i32,
-    pub name: u32,
+    pub name: super::SockaddrIn,
     pub namelen: u32,
 }
 
@@ -155,11 +155,16 @@ impl super::RPC for Connect{
 
     fn args(&self, buff: &mut heapless::Vec<u8, heapless::consts::U64>) {
         let s= self.s as i32;
-        let name= self.name as i32;
+        //let name= self.name;
         let namelen = self.namelen as u32;
-
+        let l = core::mem::size_of::<super::SockaddrIn>();
+        
         buff.extend_from_slice(&s.to_le_bytes()).ok();
-        buff.extend_from_slice(&name.to_le_bytes()).ok();
+
+        let byte = &self.name as *const _ as *const u8;
+        for i in 0..l {
+            buff.push(unsafe {*byte.offset(i as isize)});
+        }
         buff.extend_from_slice(&namelen.to_le_bytes()).ok();
     }
 

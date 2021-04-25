@@ -246,3 +246,16 @@ pub struct IPInfo {
     pub netmask: Ipv4Addr,
     pub gateway: Ipv4Addr,
 }
+
+#[repr(packed)]
+struct InAddr {
+   s_addr : u32,
+}
+#[repr(packed)]
+pub struct SockaddrIn {
+   sin_len : u8,
+   sin_family : u8,
+   sin_port : u16,
+   sin_addr: InAddr,
+   sin_zero : [i8; 8], 
+}
