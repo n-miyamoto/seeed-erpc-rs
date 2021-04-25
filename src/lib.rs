@@ -248,14 +248,14 @@ pub struct IPInfo {
 }
 
 #[repr(packed)]
-struct InAddr {
-   s_addr : u32,
+pub struct InAddr {
+   pub s_addr : u32,
 }
 #[repr(packed)]
 pub struct SockaddrIn {
-   sin_len : u8,
-   sin_family : u8,
-   sin_port : u16,
-   sin_addr: InAddr,
-   sin_zero : [i8; 8], 
+   pub sin_len : u8,
+   pub sin_family : u8,
+   pub sin_port : u16,
+   pub sin_addr: InAddr,
+   pub sin_zero : [i8; 8], 
 }
