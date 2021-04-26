@@ -158,9 +158,11 @@ impl super::RPC for Connect{
         let name= &self.name;
         let namelen = self.namelen as u32;
         let z :u64 = 0;
-        //const L:usize= core::mem::size_of::<super::SockaddrIn>();
+        const L:usize= core::mem::size_of::<super::SockaddrIn>();
         
         buff.extend_from_slice(&s.to_le_bytes()).ok();
+        buff.extend_from_slice(&L.to_le_bytes()).ok();
+
         buff.extend_from_slice(&name.sin_len.to_le_bytes()).ok();
         buff.extend_from_slice(&name.sin_family.to_le_bytes()).ok();
         buff.extend_from_slice(&name.sin_port.to_le_bytes()).ok();
