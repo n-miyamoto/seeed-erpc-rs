@@ -155,17 +155,23 @@ impl super::RPC for Connect{
 
     fn args(&self, buff: &mut heapless::Vec<u8, heapless::consts::U64>) {
         let s= self.s as i32;
-        //let name= self.name;
+        let name= &self.name;
         let namelen = self.namelen as u32;
-        const L:usize= core::mem::size_of::<super::SockaddrIn>();
+        let z :u64 = 0;
+        //const L:usize= core::mem::size_of::<super::SockaddrIn>();
         
         buff.extend_from_slice(&s.to_le_bytes()).ok();
+        buff.extend_from_slice(&name.sin_len.to_le_bytes()).ok();
+        buff.extend_from_slice(&name.sin_family.to_le_bytes()).ok();
+        buff.extend_from_slice(&name.sin_port.to_le_bytes()).ok();
+        buff.extend_from_slice(&name.sin_addr.s_addr.to_le_bytes()).ok();
+        buff.extend_from_slice(&z.to_le_bytes()).ok();
 
-        let bytes = &self.name as *const _ as *const [u8;L];
-        let bytes: [u8;L] = unsafe { *bytes };
-        for i in 0..L {
-            buff.push(bytes[i]);
-        }
+        //let bytes = &self.name as *const _ as *const [u8;L];
+        //let bytes: [u8;L] = unsafe { *bytes };
+        //for i in 0..L {
+        //    buff.push(bytes[i]);
+        //}
         buff.extend_from_slice(&namelen.to_le_bytes()).ok();
     }
 
