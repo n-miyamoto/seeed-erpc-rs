@@ -431,9 +431,14 @@ impl super::RPC for Recv{
             return Err(Err::NotOurs);
         }
 
-        //TODO read data to mem
-
+        let (mut data, len) = streaming::le_u32(data)?;
+        for _ in 0..len{
+            let (d, b) = streaming::le_u8(data)?;
+            data = d;
+            let _ = self.mem.push(b);
+        }
         let (_, num) = streaming::le_i32(data)?;
+
         Ok(num)
     }
 }
