@@ -267,6 +267,17 @@ pub struct FdSet {
    pub fd_bits: [u8; (FD_SETSIZE+7)/8], 
 }
 
+impl FdSet{
+    pub fn new() -> Self
+    {
+        FdSet {fd_bits : [0u8; (FD_SETSIZE+7)/8]}
+    }
+
+    pub fn set(mut self, index : usize){
+        self.fd_bits[0] |= 1u8<<index;
+    }
+}
+
 #[repr(packed)]
 pub struct TimeVal{
   pub tv_sec: i64,          /* seconds */
