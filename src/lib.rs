@@ -273,7 +273,7 @@ impl FdSet{
         FdSet {fd_bits : [0u8; (FD_SETSIZE+7)/8]}
     }
 
-    pub fn set(mut self, index : usize){
+    pub fn set(&mut self, index : usize){
         self.fd_bits[0] |= 1u8<<index;
     }
 }
