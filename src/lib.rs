@@ -259,3 +259,16 @@ pub struct SockaddrIn {
    pub sin_addr: InAddr,
    pub sin_zero : [i8; 8], 
 }
+
+const FD_SETSIZE : usize = 4;
+
+#[repr(packed)]
+pub struct FdSet {
+   pub fd_bits: [u8; (FD_SETSIZE+7)/8], 
+}
+
+#[repr(packed)]
+pub struct TimeVal{
+  pub tv_sec: i64,          /* seconds */
+  pub tv_usec: i64,         /* and microseconds */
+}
