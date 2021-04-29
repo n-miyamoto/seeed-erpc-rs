@@ -50,8 +50,8 @@ pub struct Getsockopt{
     pub s: i32,
     pub level: i32,
     pub optname: i32,
-    pub in_optval: u32,
-    pub out_optval: u32,
+    pub in_optval: heapless::Vec<u8, heapless::consts::U64>,
+    pub out_optval: heapless::Vec<u8, heapless::consts::U64>,
     pub optlen: u32,
 }
 
@@ -63,15 +63,16 @@ impl super::RPC for Getsockopt {
         let s= self.s as u32;
         let level= self.level as u32;
         let optname = self.optname as u32;
-        let in_optval = self.in_optval as u32;
-        let out_optval = self.out_optval as u32;
+        let in_optval = &self.in_optval;
         let optlen = self.optlen as u32;
 
         buff.extend_from_slice(&s.to_le_bytes()).ok();
         buff.extend_from_slice(&level.to_le_bytes()).ok();
         buff.extend_from_slice(&optname.to_le_bytes()).ok();
-        buff.extend_from_slice(&in_optval.to_le_bytes()).ok();
-        buff.extend_from_slice(&out_optval.to_le_bytes()).ok();
+
+        buff.extend_from_slice(&optlen.to_le_bytes()).ok();
+        buff.extend_from_slice(in_optval).ok();
+
         buff.extend_from_slice(&optlen.to_le_bytes()).ok();
     }
 
@@ -92,6 +93,8 @@ impl super::RPC for Getsockopt {
         {
             return Err(Err::NotOurs);
         }
+
+        //TODO out_optval
 
         let (_, num) = streaming::le_i32(data)?;
         Ok(num)
@@ -197,8 +200,44 @@ impl super::RPC for Connect{
 }
 
 
-/// lwip Connect function 
-//int lwip_select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset, struct timeval *timeout)
+/// lwip Close function 
+pub struct Close{
+    pub s: i32,
+}
+
+impl super::RPC for Close{
+    type ReturnValue = i32;
+    type Error = ();
+
+    fn args(&self, buff: &mut heapless::Vec<u8, heapless::consts::U64>) {
+        let s= self.s as i32;
+        buff.extend_from_slice(&s.to_le_bytes()).ok();
+    }
+
+    fn header(&self, seq: u32) -> codec::Header {
+        codec::Header {
+            sequence: seq,
+            msg_type: ids::MsgType::Invocation,
+            service: ids::Service::LWIP,
+            request: ids::LWIPRequest::Close.into(),
+        }
+    }
+
+    fn parse(&mut self, data: &[u8]) -> Result<Self::ReturnValue, Err<Self::Error>> {
+        let (data, hdr) = codec::Header::parse(data)?;
+        if hdr.msg_type != ids::MsgType::Reply
+            || hdr.service != ids::Service::LWIP
+            || hdr.request != ids::LWIPRequest::Close.into()
+        {
+            return Err(Err::NotOurs);
+        }
+
+        let (_, num) = streaming::le_i32(data)?;
+        Ok(num)
+    }
+}
+
+/// lwip Select function 
 pub struct Select{
     pub s: i32,
     pub readset:   Option<super::FdSet>,
