@@ -131,7 +131,7 @@ pub enum LWIPRequest {
     Close = 8,
     Connect = 9, 
     Recv = 12, 
-    Send = 17,
+    Send = 15,
     Socket = 18,
     Select = 21,
     Fcntl = 23,
