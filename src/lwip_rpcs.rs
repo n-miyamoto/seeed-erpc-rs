@@ -347,3 +347,93 @@ impl super::RPC for Select{
         Ok(num)
     }
 }
+
+
+/// lwip Send function 
+pub struct Send{
+    pub s: i32,
+    pub data: heapless::Vec<u8, heapless::consts::U64>,
+    pub flag: i32,
+}
+
+impl super::RPC for Send{
+    type ReturnValue = i32;
+    type Error = ();
+
+    fn args(&self, buff: &mut heapless::Vec<u8, heapless::consts::U64>) {
+        buff.extend_from_slice(&self.s.to_le_bytes()).ok();
+
+        buff.extend_from_slice(&(self.data.len() as u32).to_le_bytes()).ok();
+        buff.extend_from_slice(&self.data).ok();
+        buff.extend_from_slice(&self.flag.to_le_bytes()).ok();
+    }
+
+    fn header(&self, seq: u32) -> codec::Header {
+        codec::Header {
+            sequence: seq,
+            msg_type: ids::MsgType::Invocation,
+            service: ids::Service::LWIP,
+            request: ids::LWIPRequest::Send.into(),
+        }
+    }
+
+    fn parse(&mut self, data: &[u8]) -> Result<Self::ReturnValue, Err<Self::Error>> {
+        let (data, hdr) = codec::Header::parse(data)?;
+        if hdr.msg_type != ids::MsgType::Reply
+            || hdr.service != ids::Service::LWIP
+            || hdr.request != ids::LWIPRequest::Send.into()
+        {
+            return Err(Err::NotOurs);
+        }
+
+        let (_, num) = streaming::le_i32(data)?;
+        Ok(num)
+    }
+}
+
+
+/// lwip Recv function 
+pub struct Recv{
+    pub s: i32,
+    pub mem: heapless::Vec<u8, heapless::consts::U64>,
+    pub len : u32,
+    pub flag: i32,
+    pub timeout : u32,
+
+}
+
+impl super::RPC for Recv{
+    type ReturnValue = i32;
+    type Error = ();
+
+    fn args(&self, buff: &mut heapless::Vec<u8, heapless::consts::U64>) {
+        buff.extend_from_slice(&self.s.to_le_bytes()).ok();
+        buff.extend_from_slice(&self.len.to_le_bytes()).ok();
+        buff.extend_from_slice(&self.flag.to_le_bytes()).ok();
+        buff.extend_from_slice(&self.timeout.to_le_bytes()).ok();
+    }
+
+    fn header(&self, seq: u32) -> codec::Header {
+        codec::Header {
+            sequence: seq,
+            msg_type: ids::MsgType::Invocation,
+            service: ids::Service::LWIP,
+            request: ids::LWIPRequest::Recv.into(),
+        }
+    }
+
+    fn parse(&mut self, data: &[u8]) -> Result<Self::ReturnValue, Err<Self::Error>> {
+        let (data, hdr) = codec::Header::parse(data)?;
+        if hdr.msg_type != ids::MsgType::Reply
+            || hdr.service != ids::Service::LWIP
+            || hdr.request != ids::LWIPRequest::Recv.into()
+        {
+            return Err(Err::NotOurs);
+        }
+
+        //TODO read data to mem
+
+        let (_, num) = streaming::le_i32(data)?;
+        Ok(num)
+    }
+}
