@@ -393,16 +393,16 @@ impl super::RPC for Send{
 
 
 /// lwip Recv function 
-pub struct Recv{
+pub struct Recv<'a>{
     pub s: i32,
-    pub mem: heapless::Vec<u8, heapless::consts::U64>,
+    pub mem: &'a mut heapless::Vec<u8, heapless::consts::U64>,
     pub len : u32,
     pub flag: i32,
     pub timeout : u32,
 
 }
 
-impl super::RPC for Recv{
+impl<'a> super::RPC for Recv<'a>{
     type ReturnValue = i32;
     type Error = ();
 
