@@ -395,7 +395,7 @@ impl super::RPC for Send{
 /// lwip Recv function 
 pub struct Recv<'a>{
     pub s: i32,
-    pub mem: &'a mut heapless::Vec<u8, heapless::consts::U64>,
+    pub mem: &'a mut heapless::Vec<u8, heapless::consts::U512>,
     pub len : u32,
     pub flag: i32,
     pub timeout : u32,
