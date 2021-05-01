@@ -485,7 +485,7 @@ impl<'a> super::RPC for GethostbynameAddrtype<'a>{
             sequence: seq,
             msg_type: ids::MsgType::Invocation,
             service: ids::Service::LWIP,
-            request: ids::LWIPRequest::Recv.into(),
+            request: ids::LWIPRequest::GethostbynameAddrtype.into(),
         }
     }
 
@@ -493,7 +493,7 @@ impl<'a> super::RPC for GethostbynameAddrtype<'a>{
         let (data, hdr) = codec::Header::parse(data)?;
         if hdr.msg_type != ids::MsgType::Reply
             || hdr.service != ids::Service::LWIP
-            || hdr.request != ids::LWIPRequest::Recv.into()
+            || hdr.request != ids::LWIPRequest::GethostbynameAddrtype.into()
         {
             return Err(Err::NotOurs);
         }
