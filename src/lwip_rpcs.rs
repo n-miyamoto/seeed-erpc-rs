@@ -450,7 +450,6 @@ pub struct GethostbynameAddrtype<'a>{
     pub found : u32,
     pub callback_arg: Option<heapless::Vec<u8, heapless::consts::U64>>,
     pub dns_addrtype : u8,
-
 }
 
 impl<'a> super::RPC for GethostbynameAddrtype<'a>{
@@ -459,6 +458,7 @@ impl<'a> super::RPC for GethostbynameAddrtype<'a>{
 
     fn args(&self, buff: &mut heapless::Vec<u8, heapless::consts::U64>) {
         let callback = &self.callback_arg;
+
         buff.extend_from_slice(&self.hostname.len().to_le_bytes()).ok();
         buff.extend_from_slice(&self.hostname).ok();
 
@@ -472,6 +472,7 @@ impl<'a> super::RPC for GethostbynameAddrtype<'a>{
             Some(i) => {
                 let null_flag = 0u8;
                 buff.extend_from_slice(&null_flag.to_le_bytes()).ok();
+                buff.extend_from_slice(&i.len().to_le_bytes()).ok();
                 buff.extend_from_slice(&i).ok();
             },
         }
