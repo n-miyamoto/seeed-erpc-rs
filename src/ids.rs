@@ -135,6 +135,7 @@ pub enum LWIPRequest {
     Socket = 18,
     Select = 21,
     Fcntl = 23,
+    GethostbynameAddrtype = 26,
 }
 
 impl From<LWIPRequest> for u8 {

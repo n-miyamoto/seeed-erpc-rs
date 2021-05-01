@@ -442,3 +442,71 @@ impl<'a> super::RPC for Recv<'a>{
         Ok(num)
     }
 }
+
+/// GethostbynameAddrtype function 
+pub struct GethostbynameAddrtype<'a>{
+    pub hostname: heapless::Vec<u8, heapless::consts::U64>,
+    pub addr: &'a mut super::SockaddrIn,
+    pub found : u32,
+    pub callback_arg: Option<heapless::Vec<u8, heapless::consts::U64>>,
+    pub dns_addrtype : u8,
+
+}
+
+impl<'a> super::RPC for GethostbynameAddrtype<'a>{
+    type ReturnValue = i8;
+    type Error = ();
+
+    fn args(&self, buff: &mut heapless::Vec<u8, heapless::consts::U64>) {
+        let callback = &self.callback_arg;
+        buff.extend_from_slice(&self.hostname.len().to_le_bytes()).ok();
+        buff.extend_from_slice(&self.hostname).ok();
+
+        buff.extend_from_slice(&self.found.to_le_bytes()).ok();
+
+        match callback{
+            None => {
+                let null_flag = 1u8;
+                buff.extend_from_slice(&null_flag.to_le_bytes()).ok();
+            },
+            Some(i) => {
+                let null_flag = 0u8;
+                buff.extend_from_slice(&null_flag.to_le_bytes()).ok();
+                buff.extend_from_slice(&i).ok();
+            },
+        }
+
+        buff.extend_from_slice(&self.dns_addrtype.to_le_bytes()).ok();
+    }
+
+    fn header(&self, seq: u32) -> codec::Header {
+        codec::Header {
+            sequence: seq,
+            msg_type: ids::MsgType::Invocation,
+            service: ids::Service::LWIP,
+            request: ids::LWIPRequest::Recv.into(),
+        }
+    }
+
+    fn parse(&mut self, data: &[u8]) -> Result<Self::ReturnValue, Err<Self::Error>> {
+        let (data, hdr) = codec::Header::parse(data)?;
+        if hdr.msg_type != ids::MsgType::Reply
+            || hdr.service != ids::Service::LWIP
+            || hdr.request != ids::LWIPRequest::Recv.into()
+        {
+            return Err(Err::NotOurs);
+        }
+
+        let (data, len) = streaming::le_u8(data)?;
+        let (data, family) = streaming::le_u8(data)?;
+        let (data, port) = streaming::le_u16(data)?;
+        let (data, addr) = streaming::le_u32(data)?;
+        let (_, num) = streaming::le_i8(data)?;
+
+        self.addr.sin_len = len;
+        self.addr.sin_family = family;
+        self.addr.sin_port = port;
+        self.addr.sin_addr.s_addr = addr;
+        Ok(num)
+    }
+}
