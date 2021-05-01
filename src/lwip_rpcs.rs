@@ -498,6 +498,7 @@ impl<'a> super::RPC for GethostbynameAddrtype<'a>{
             return Err(Err::NotOurs);
         }
 
+        let (data, len) = streaming::le_u32(data)?;
         let (data, len) = streaming::le_u8(data)?;
         let (data, family) = streaming::le_u8(data)?;
         let (data, port) = streaming::le_u16(data)?;
