@@ -459,7 +459,7 @@ impl<'a> super::RPC for GethostbynameAddrtype<'a>{
     fn args(&self, buff: &mut heapless::Vec<u8, heapless::consts::U64>) {
         let callback = &self.callback_arg;
 
-        buff.extend_from_slice(&self.hostname.len().to_le_bytes()).ok();
+        buff.extend_from_slice(&(self.hostname.len() as u32).to_le_bytes()).ok();
         buff.extend_from_slice(&self.hostname).ok();
 
         buff.extend_from_slice(&self.found.to_le_bytes()).ok();
