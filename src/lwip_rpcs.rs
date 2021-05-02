@@ -352,7 +352,7 @@ impl super::RPC for Select{
 /// lwip Send function 
 pub struct Send{
     pub s: i32,
-    pub data: heapless::Vec<u8, heapless::consts::U64>,
+    pub data: heapless::Vec<u8, heapless::consts::U512>,
     pub flag: i32,
 }
 
