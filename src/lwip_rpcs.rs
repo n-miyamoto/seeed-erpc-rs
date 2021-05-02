@@ -446,7 +446,7 @@ impl<'a> super::RPC for Recv<'a>{
 /// GethostbynameAddrtype function 
 pub struct GethostbynameAddrtype<'a>{
     pub hostname: heapless::Vec<u8, heapless::consts::U64>,
-    pub addr: &'a mut super::SockaddrIn,
+    pub ip_addr: &'a mut super::IpAddrType,
     pub found : u32,
     pub callback_arg: Option<heapless::Vec<u8, heapless::consts::U64>>,
     pub dns_addrtype : u8,
@@ -499,16 +499,20 @@ impl<'a> super::RPC for GethostbynameAddrtype<'a>{
         }
 
         let (data, len) = streaming::le_u32(data)?;
-        let (data, len) = streaming::le_u8(data)?;
-        let (data, family) = streaming::le_u8(data)?;
-        let (data, port) = streaming::le_u16(data)?;
-        let (data, addr) = streaming::le_u32(data)?;
+
+        let (data, addr0) = streaming::le_u32(data)?;
+        let (data, addr1) = streaming::le_u32(data)?;
+        let (data, addr2) = streaming::le_u32(data)?;
+        let (data, addr3) = streaming::le_u32(data)?;
+        let (data, t) = streaming::le_u8(data)?;
         let (_, num) = streaming::le_i8(data)?;
 
-        self.addr.sin_len = len;
-        self.addr.sin_family = family;
-        self.addr.sin_port = port;
-        self.addr.sin_addr.s_addr = addr;
+        self.ip_addr.addr[0]= addr0;
+        self.ip_addr.addr[1]= addr1;
+        self.ip_addr.addr[2]= addr2;
+        self.ip_addr.addr[3]= addr3;
+        self.ip_addr.t = t;
+        self.ip_addr.len = len;
         Ok(num)
     }
 }

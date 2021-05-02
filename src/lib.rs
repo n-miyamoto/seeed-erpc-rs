@@ -283,3 +283,10 @@ pub struct TimeVal{
   pub tv_sec: i64,          /* seconds */
   pub tv_usec: i64,         /* and microseconds */
 }
+
+#[repr(packed)]
+pub struct IpAddrType{
+    pub addr : [u32;4],
+    pub t : u8,
+    pub len : u32, //for debug
+}
