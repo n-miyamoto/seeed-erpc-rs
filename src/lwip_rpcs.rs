@@ -500,24 +500,10 @@ impl<'a> super::RPC for GethostbynameAddrtype<'a>{
 
         let (data, len) = streaming::le_u32(data)?;
         self.ip_addr.len = len;
+        let (data, addr) = streaming::le_u32(data)?;
+        self.ip_addr.addr[0]= addr;
 
-        let (data, addr0) = streaming::le_u32(data)?;
-        self.ip_addr.addr[0]= addr0;
-
-        let (data, addr1) = streaming::le_u32(data)?;
-        self.ip_addr.addr[1]= addr1;
-
-        let (data, addr2) = streaming::le_u32(data)?;
-        self.ip_addr.addr[2]= addr2;
-
-        let (data, addr3) = streaming::le_u32(data)?;
-        self.ip_addr.addr[3]= addr3;
-        
-        let (data, t) = streaming::le_u8(data)?;
-        self.ip_addr.t = t;
-        
         let (_, num) = streaming::le_i8(data)?;
-
         self.ip_addr.len = len;
         Ok(num)
     }
